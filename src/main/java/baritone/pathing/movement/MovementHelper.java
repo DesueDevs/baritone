@@ -488,6 +488,21 @@ public interface MovementHelper extends ActionCosts, Helper {
         return canWalkOn(bsi, x, y, z, bsi.get0(x, y, z));
     }
 
+    static boolean hasFrostWalker (IPlayerContext ctx) {
+        for (EquipmentSlot slot : EquipmentSlot.values()) {
+            ItemEnchantments itemEnchantments = ctx
+                    .player()
+                    .getItemBySlot(slot)
+                    .getEnchantments();
+            for (Holder<Enchantment> enchant : itemEnchantments.keySet()) {
+                if (enchant.is(Enchantments.FROST_WALKER)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     static boolean canUseFrostWalker(CalculationContext context, BlockState state) {
         return context.frostWalker != 0
                 && state == FrostedIceBlock.meltsInto()
@@ -495,19 +510,7 @@ public interface MovementHelper extends ActionCosts, Helper {
     }
 
     static boolean canUseFrostWalker(IPlayerContext ctx, BlockPos pos) {
-        boolean hasFrostWalker = false;
-        OUTER: for (EquipmentSlot slot : EquipmentSlot.values()) {
-            ItemEnchantments itemEnchantments = ctx
-                .player()
-                .getItemBySlot(slot)
-                .getEnchantments();
-            for (Holder<Enchantment> enchant : itemEnchantments.keySet()) {
-                if (enchant.is(Enchantments.FROST_WALKER)) {
-                    hasFrostWalker = true;
-                    break OUTER;
-                }
-            }
-        }
+        boolean hasFrostWalker = hasFrostWalker(ctx);
         BlockState state = BlockStateInterface.get(ctx, pos);
         return hasFrostWalker
                 && state == FrostedIceBlock.meltsInto()
@@ -726,6 +729,10 @@ public interface MovementHelper extends ActionCosts, Helper {
                 ctx.playerRotations().getPitch()
         ), true));
         moveTowardsWithoutRotation(ctx, state, idealYaw);
+    }
+
+    static boolean isWaterLogged(BlockState state) {
+        return state.hasProperty(BlockStateProperties.WATERLOGGED);
     }
 
     /**

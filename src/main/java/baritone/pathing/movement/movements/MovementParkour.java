@@ -265,7 +265,7 @@ public class MovementParkour extends Movement {
         if (dist >= 4 || ascend) {
             state.setInput(Input.SPRINT, true);
         }
-        if (Baritone.settings().allowWalkOnMagmaBlocks.value && ctx.world().getBlockState(ctx.playerFeet().below()).is(Blocks.MAGMA_BLOCK)) {
+        if (Baritone.settings().allowWalkOnMagmaBlocks.value && ctx.world().getBlockState(ctx.playerFeet().below()).is(Blocks.MAGMA_BLOCK) && !MovementHelper.hasFrostWalker(ctx)); {
             state.setInput(Input.SNEAK, true);
         }
 

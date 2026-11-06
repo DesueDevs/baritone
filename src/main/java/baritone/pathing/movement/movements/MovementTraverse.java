@@ -86,21 +86,27 @@ public class MovementTraverse extends Movement {
             boolean water = false;
             boolean sneaking = false;
             if (MovementHelper.isWater(pb0) || MovementHelper.isWater(pb1)) {
-                WC = context.waterWalkSpeed;
-                water = true;
+                if (frostWalker && !MovementHelper.isWaterLogged(pb0) && !MovementHelper.isWaterLogged(pb1)) {
+                    // No penilty for frost walker if the blocks are not waterlogged, since we can walk on them, and they are full blocks
+                }else {
+                    WC = context.waterWalkSpeed;
+                    water = true;
+                }
             } else {
                 if (destOn.getBlock() == Blocks.SOUL_SAND) {
                     WC += (WALK_ONE_OVER_SOUL_SAND_COST - WALK_ONE_BLOCK_COST) / 2;
                 } else if (frostWalker) {
-                    // with frostwalker we can walk on water without the penalty, if we are sure we won't be using jesus
+                    // we keep this here in the case of jesus since you dont need a full block of water to stand on it with jesus, but you do need a full block of water to walk on it with frostwalker
                 } else if (destOn.getBlock() == Blocks.WATER) {
                     WC += context.walkOnWaterOnePenalty;
                 }
                 if (srcDownBlock == Blocks.SOUL_SAND) {
                     WC += (WALK_ONE_OVER_SOUL_SAND_COST - WALK_ONE_BLOCK_COST) / 2;
                 } else if (context.allowWalkOnMagmaBlocks && srcDownBlock.equals(Blocks.MAGMA_BLOCK)) {
-                    sneaking = true;
-                    WC += (SNEAK_ONE_BLOCK_COST - WALK_ONE_BLOCK_COST) / 2;
+                    if (context.frostWalker == 0) {
+                        sneaking = true;
+                    }
+                    WC += sneaking ? (SNEAK_ONE_BLOCK_COST - WALK_ONE_BLOCK_COST) / 2 : WALK_ONE_BLOCK_COST;
                 }
             }
             double hardness1 = MovementHelper.getMiningDurationTicks(context, destX, y, destZ, pb1, false);
@@ -220,7 +226,10 @@ public class MovementTraverse extends Movement {
         boolean ladder = MovementHelper.isClimbable(fd);
 
         //sneak may have been set to true in the PREPPING state while mining an adjacent block, but we still want it to be true if the player is about to go on magma
-        state.setInput(Input.SNEAK, Baritone.settings().allowWalkOnMagmaBlocks.value && MovementHelper.steppingOnBlocks(ctx).stream().anyMatch(block -> ctx.world().getBlockState(block).is(Blocks.MAGMA_BLOCK)));
+        state.setInput(Input.SNEAK,
+                Baritone.settings().allowWalkOnMagmaBlocks.value
+                        && MovementHelper.steppingOnBlocks(ctx).stream().anyMatch(block -> ctx.world().getBlockState(block).is(Blocks.MAGMA_BLOCK))
+                        && !MovementHelper.hasFrostWalker(ctx)); // don't sneak if we have frostwalker, since we won't take damage from magma blocks
 
         if (!MovementHelper.openDoors(ctx, state, src, dest)) {
             return state;
