@@ -242,6 +242,13 @@ public final class Settings {
     )));
 
     /**
+     * Blocks that Baritone is allowed to walk on even if they are not normally walkable (like cactus, fences.)
+     */
+    public final Setting<List<Block>> overrideCanWalkOnBlocks = new Setting<>(new ArrayList<>(
+            // Leave Empty by Default
+    ));
+
+    /**
      * Blocks that Baritone is not allowed to break
      */
     public final Setting<List<Block>> blocksToDisallowBreaking = new Setting<>(new ArrayList<>(

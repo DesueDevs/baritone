@@ -42,7 +42,6 @@ import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.piston.MovingPistonBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DoorHingeSide;
 import net.minecraft.world.level.block.state.properties.Half;
 import net.minecraft.world.level.block.state.properties.SlabType;
@@ -433,6 +432,9 @@ public interface MovementHelper extends ActionCosts, Helper {
                 }
                 return NO;
             }
+            return YES;
+        }
+        if (Baritone.settings().overrideCanWalkOnBlocks.value.contains(block)) {
             return YES;
         }
         return NO;
